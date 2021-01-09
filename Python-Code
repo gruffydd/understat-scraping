@@ -1,0 +1,40 @@
+import asyncio
+import json
+import csv
+import aiohttp
+from understat import Understat
+import pandas as pd
+
+
+# Player shot locations code
+async def main():
+    async with aiohttp.ClientSession() as session:
+        understat = Understat(session)
+        out_file = open("Input where you want to export your JSON file to here (make sure to add add .json to file)", "w")
+        playershots = await understat.get_player_shots(
+            2097, #the player you want info on
+            #{"season": "2014"} #here you can filter for only a specific season
+            )
+        print(json.dump(playershots, out_file, indent = 6))
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+pdObj = pd.read_json("Input JSON file location here")
+pdObj.to_csv("Input where you want your csv file to print to here (make sure to add .csv to file)", index=False)
+
+
+
+# Team stats for a season
+async def main():
+    async with aiohttp.ClientSession() as session:
+        understat = Understat(session)
+        out_file = open("Input where you want to export your JSON file to here (make sure to add add .json to file)", "w")
+        teamstats = await understat.get_league_players(
+            "EPL", #Use the correct name for the league on understat.com
+            2020 #the season you want data for
+        )
+        print(json.dump(teamstats, out_file, indent = 6))
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+pdObj = pd.read_json("Input JSON file location here")
+pdObj.to_csv("Input where you want your csv file to print to here (make sure to add .csv to file)", index=False)
